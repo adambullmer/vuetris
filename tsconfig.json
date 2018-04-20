@@ -7,8 +7,11 @@
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
     "baseUrl": ".",
     "types": [
       "node",
@@ -27,5 +30,12 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "lib": [
+    "es5",
+    "es2015.collection",
+    "es2015.promise",
+    "dom",
+    "es2016.array.include"
+  ],
 }
