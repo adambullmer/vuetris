@@ -1,28 +1,29 @@
 import Vue from "vue";
-import * as mutations from "./mutation_types";
-import { State, Piece, GameRow, AdvancePieceType } from "./types";
+import * as mutation from "./mutation_types";
+import { BoardState, Piece, GameRow, AdvancePieceType } from "./types";
 import { guid } from "@/utils";
+import { MutationTree } from "vuex";
 
-export default {
-  // [mutations.SET_ACTIVE_PIECE]: (state: State, piece: Shape) => {
+export const mutations: MutationTree<BoardState> = {
+  // [mutations.SET_ACTIVE_PIECE](state: State, piece: Shape) {
   //   Vue.set(state, "activePiece", piece);
   // },
-  [mutations.DEQUEUE_PIECE]: (state: State, newPiece: Piece) => {
+  [mutation.DEQUEUE_PIECE](state: BoardState, newPiece: Piece) {
     state.pieceQueue.push(newPiece);
     const piece = state.pieceQueue.shift();
     Vue.set(state, "activePiece", piece);
   },
-  // [mutations.ADD_PIECE]: ({ pieceQueue }: State, piece: Piece) => {
-  //   pieceQueue.push(piece);
-  // },
-  [mutations.ROTATE_PIECE]: ({ activePiece }: State, newPosition: number) => {
+  [mutation.ADD_PIECE]({ pieceQueue }: BoardState, piece: Piece) {
+    pieceQueue.push(piece);
+  },
+  [mutation.ROTATE_PIECE]({ activePiece }: BoardState, newPosition: number) {
     if (activePiece === null) {
       return;
     }
 
     activePiece.maskPosition = newPosition;
   },
-  [mutations.TRANSLATE_PIECE]: ({ activePiece }: State, {x = 0, y = 0}) => {
+  [mutation.TRANSLATE_PIECE]({ activePiece }: BoardState, {x = 0, y = 0}) {
     if (activePiece === null) {
       return;
     }
@@ -30,7 +31,7 @@ export default {
     activePiece.x += x;
     activePiece.y += y;
   },
-  [mutations.SET_PIECE]: (state: State, gameBoardLayer: number[]) => {
+  [mutation.SET_PIECE](state: BoardState, gameBoardLayer: number[]) {
     const { gameBoard, activePiece, shapes } = state;
     if (activePiece === null) {
       return;
@@ -44,14 +45,14 @@ export default {
 
     Vue.set(state, "activePiece", null);
   },
-  [mutations.REMOVE_ROWS]: ({ gameBoard, shapes, isRemovingRows }: State, rows: number[]) => {
+  [mutation.REMOVE_ROWS]({ gameBoard, shapes, isRemovingRows }: BoardState, rows: number[]) {
     isRemovingRows = true;
 
     rows.forEach((row) => {
       gameBoard.splice(row, 1);
     });
   },
-  [mutations.ADD_ROWS]: ({ gameBoard, shapes, isRemovingRows }: State, rows: number) => {
+  [mutation.ADD_ROWS]({ gameBoard, shapes, isRemovingRows }: BoardState, rows: number) {
     for (let x = 0; x < rows; x++) {
       const row: GameRow = Object.keys(shapes).map(() => 0x0000000000);
       row.id = guid();
@@ -60,7 +61,7 @@ export default {
 
     isRemovingRows = false;
   },
-  [mutations.DROP_PIECE]: ({ activePiece }: State, { isSoft, isHard }: AdvancePieceType) => {
+  [mutation.DROP_PIECE]({ activePiece }: BoardState, { isSoft, isHard }: AdvancePieceType) {
     if (activePiece === null) {
       return;
     }
@@ -71,4 +72,14 @@ export default {
       activePiece.softDrops++;
     }
   },
+  [mutation.CLEAR_BOARD]({ gameBoard }: BoardState) {
+    gameBoard.splice(0, gameBoard.length);
+  },
+  [mutation.FILL_BOARD]({ boardColumns, boardRows, gameBoard, shapes }: BoardState) {
+    for (let i = 0; i < boardRows; i++) {
+      const row: GameRow = Object.keys(shapes).map(() => 0x0000000000);
+      row.id = guid();
+      gameBoard.push(row);
+    }
+  }
 };

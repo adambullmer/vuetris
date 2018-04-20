@@ -1,7 +1,9 @@
-import * as actions from "./actions";
-import * as getters from "./getters";
-import mutations from "./mutations";
-import { State, GameRow } from "./types";
+import { Module } from "vuex";
+import { actions } from "./actions";
+import { getters } from "./getters";
+import { mutations } from "./mutations";
+import { BoardState, GameRow } from "./types";
+import { RootState } from "@/store/types";
 import { guid } from "@/utils";
 
 const shapes = {
@@ -16,17 +18,11 @@ const shapes = {
 const boardColumns = 10;
 const boardRows = 20;
 const gameBoard: GameRow[] = [];
-for (let i = 0; i < boardRows; i++) {
-  const row: GameRow = Object.keys(shapes).map(() => 0x0000000000);
-  row.id = guid();
-  gameBoard.push(row);
-}
-
 const piece = { x: 0, y: 0, softDrops: 0, hardDrops: 0, maskPosition: 0, shape: { name: "Tetromino", mask: [0x0000]} };
 
-const state: State = {
-  pieceQueue: [piece, piece, piece],
-  activePiece: piece,
+const state: BoardState = {
+  pieceQueue: [],
+  activePiece: null,
   boardColumns,
   boardRows,
   gameBoard,
@@ -35,4 +31,6 @@ const state: State = {
   isRemovingRows: false,
 };
 
-export default { state, getters, actions, mutations };
+const boardStore: Module<BoardState, RootState> = { state, getters, actions, mutations };
+
+export default boardStore;

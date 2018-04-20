@@ -1,9 +1,11 @@
-import * as actions from "./actions";
-// import * as getters from "./getters";
-import mutations from "./mutations";
-import { State } from "./types";
+import { actions } from "./actions";
+import { getters } from "./getters";
+import { mutations } from "./mutations";
+import { ScoreState } from "./types";
+import { RootState } from "@/store/types";
+import { Module } from "vuex";
 
-const state: State = {
+const state: ScoreState = {
     level: 1,
     score: 0,
     lines: 0,
@@ -11,5 +13,6 @@ const state: State = {
     isEnded: false,
 };
 
-export default { state, actions, mutations };
-// export default { state, getters, actions, mutations };
+const scoreStore: Module<ScoreState, RootState> = { state, getters, actions, mutations };
+
+export default scoreStore;

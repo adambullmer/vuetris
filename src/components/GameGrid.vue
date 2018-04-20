@@ -1,5 +1,5 @@
 <template>
-  <transition-group class="gameboard" name="row" @after-leave="afterLeave" mode="out-in">
+  <transition-group class="gameboard" name="row" @after-leave="addRows" mode="out-in">
     <div class="row" v-for="(gameRow, row) in gameGrid" :key="`${gameRow.id}-row`">
       <game-cell v-for="column in columns" :key="`${column}-cell`" v-model="renderedGrid[row][column - 1]"></game-cell>
     </div>
@@ -8,8 +8,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapActions, mapState } from "vuex";
-import { Piece } from "@/store/board/types";
+import { mapActions, mapState, MapperForState, mapGetters } from "vuex";
+import { RootState } from "../store/types";
+import { BoardState } from "../store/board/types";
+import { Piece, State } from "@/store/board/types";
 
 import GameCell from "@/components/GameCell.vue";
 
@@ -22,17 +24,12 @@ type CellGrid = Cell[][];
 export default Vue.extend({
   name: "GameGrid",
   computed: {
-    ...mapState({
-      rows: ({ boardStore }: any) => boardStore.boardRows,
-      columns: ({ boardStore }: any) => boardStore.boardColumns,
-      gameGrid: ({ boardStore }: any) => boardStore.gameBoard,
-      maskNameMap: ({ boardStore }: any) => Object.keys(boardStore.shapes),
-      piece: ({ boardStore }: any) => boardStore.activePiece,
-    }),
     renderedGrid(): CellGrid {
       const gameGrid: number[][] = this.gameGrid;
       const maskNameMap: string[] = this.maskNameMap;
       const grid: CellGrid = [];
+
+      this.rows
 
       let bit = 1;
       // build current board without active piece overlay
@@ -73,12 +70,16 @@ export default Vue.extend({
 
       return grid;
     },
+    ...mapState({
+      rows(state: RootState) { return state.boardStore.; },
+      columns: ({ boardStore }) => boardStore.boardColumns,
+      gameGrid: ({ boardStore }) => boardStore.gameBoard,
+      maskNameMap: ({ boardStore }) => Object.keys(boardStore.shapes),
+      piece: ({ boardStore }) => boardStore.activePiece,
+    }),
   },
   methods: {
     ...mapActions(["addRows"]),
-    afterLeave() {
-      this.addRows();
-    },
   },
   components: { GameCell },
 });

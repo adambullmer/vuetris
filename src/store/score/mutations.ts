@@ -1,24 +1,29 @@
-import * as mutations from "./mutation_types";
-import { State } from "./types";
+import * as mutation from "./mutation_types";
+import { ScoreState } from "./types";
+import { MutationTree } from "vuex";
 
-export default {
-    [mutations.LEVEL_UP]: (state: State) => {
+export const mutations: MutationTree<ScoreState> = {
+    [mutation.LEVEL_UP](state) {
         state.level++;
     },
-    [mutations.ADD_LINES]: (state: State, lines: number) => {
+    [mutation.ADD_LINES](state, lines: number) {
         state.lines += lines;
     },
-    [mutations.ADD_SCORE]: (state: State, points: number) => {
+    [mutation.ADD_SCORE](state, points: number) {
         state.score += points;
     },
-    [mutations.START_GAME]: (state: State) => {
+    [mutation.START_GAME](state) {
         state.isStarted = true;
+        state.isEnded = false;
+        state.score = 0;
+        state.level = 1;
+        state.lines = 0;
     },
-    [mutations.END_GAME]: (state: State) => {
+    [mutation.END_GAME](state) {
         state.isEnded = true;
         state.isStarted = false;
     },
-    [mutations.PAUSE_GAME]: (state: State) => {
-        state.isStarted = false;
+    [mutation.PAUSE_GAME](state) {
+        state.isStarted = !state.isStarted;
     },
 };

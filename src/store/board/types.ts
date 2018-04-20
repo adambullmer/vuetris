@@ -1,6 +1,6 @@
 import { ActionContext } from "vuex";
 
-export type Context = ActionContext<State, {}>;
+export type Context = ActionContext<BoardState, {}>;
 export type PieceQueue = Piece[];
 
 export interface GameRow {
@@ -12,7 +12,7 @@ export interface GameRow {
   ) => number;
 }
 
-export interface State {
+export interface BoardState {
   pieceQueue: PieceQueue;
   activePiece: Piece | null;
   boardColumns: number;

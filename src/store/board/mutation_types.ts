@@ -7,3 +7,5 @@ export const SET_PIECE = "SET_PIECE";
 export const REMOVE_ROWS = "REMOVE_ROWS";
 export const ADD_ROWS = "ADD_ROWS";
 export const DROP_PIECE = "DROP_PIECE";
+export const CLEAR_BOARD = "CLEAR_BOARD";
+export const FILL_BOARD = "FILL_BOARD";

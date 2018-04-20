@@ -20,6 +20,12 @@
                 </section>
             </aside>
         </div>
+        <div class="modal" v-if="isEnded">
+            <div class="modal-content">
+                <p>Game Over! Final Score: {{ score }}.</p>
+                <button @click="startGame">Retry</button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -29,7 +35,6 @@ import { mapState, mapActions } from "vuex";
 
 import GameGrid from "@/components/GameGrid.vue";
 import TetrominoPreview from "@/components/TetrominoPreview.vue";
-import { ADD_ROWS } from "@/store/board/mutation_types";
 
 const keyLeft = 37;
 const keyUp = 38;
@@ -71,7 +76,6 @@ export default Vue.extend({
             if (newValue === true) {
                 window.clearInterval(this.advanceTimer);
             }
-            alert(`Game Over! Final Score: ${this.score}`);
         },
     },
     methods: {
@@ -90,7 +94,7 @@ export default Vue.extend({
                     break;
                 case keyUp:
                     window.clearInterval(this.advanceTimer);
-                    this.advanceTimer = window.setInterval(this.hardDropPiece, 1);
+                    this.advanceTimer = window.setInterval(this.hardDropPiece, 10);
                     event.preventDefault();
                     event.stopPropagation();
                     break;
@@ -151,5 +155,22 @@ export default Vue.extend({
 #piece_preview_section figure {
     margin-left: 0;
     margin-right: 0;
+}
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.3);
+}
+.modal-content {
+    position: relative;
+    top: calc(50% - 50px);
+    margin: 0 auto;
+    width: 400px;
+    padding: 20px;
+    text-align: center;
+    background-color:#ffffff;
 }
 </style>
