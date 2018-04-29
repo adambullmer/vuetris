@@ -8,7 +8,7 @@
                 <section id="piece_preview_section">
                     <div>Next Up:</div>
                     <figure v-for="(piece, index) in pieceQueue" :key="index">
-                        <tetromino-preview :piece="piece"></tetromino-preview>
+                        <tetromino-preview :piece="piece" v-show="isStarted"></tetromino-preview>
                     </figure>
                 </section>
                 <section id="score_section">
@@ -23,7 +23,7 @@
         <div class="modal" v-if="isEnded">
             <div class="modal-content">
                 <p>Game Over! Final Score: {{ score }}.</p>
-                <button @click="startGame">Retry</button>
+                <button @click="restartGame">Retry</button>
             </div>
         </div>
     </div>
@@ -31,10 +31,11 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState, mapActions } from "vuex";
-
+import { mapActions, Store } from "vuex";
+import { Piece } from "@/store/board/types";
 import GameGrid from "@/components/GameGrid.vue";
 import TetrominoPreview from "@/components/TetrominoPreview.vue";
+import { PerformanceObserver } from "perf_hooks";
 
 const keyLeft = 37;
 const keyUp = 38;
@@ -42,13 +43,19 @@ const keyRight = 39;
 const keyDown = 40;
 const keyCtrl = 17;
 const keyShift = 16;
+const keyEscape = 27;
+const keySpace = 32;
+const keyEnter = 13;
+
+interface LocalState {
+    advanceTimer: number;
+}
 
 export default Vue.extend({
     name: "Game",
-    data(): { advanceTimer: number, storeSubscription: any } {
+    data(): LocalState {
         return {
             advanceTimer: 0,
-            storeSubscription: null,
         };
     },
     mounted() {
@@ -61,7 +68,7 @@ export default Vue.extend({
     watch: {
         activePiece(newValue) {
             window.clearInterval(this.advanceTimer);
-            if (newValue !== null) {
+            if (newValue !== null && this.isEnded === false) {
                 this.advanceTimer = window.setInterval(this.advancePiece, this.gameTick);
             }
         },
@@ -79,7 +86,7 @@ export default Vue.extend({
         },
     },
     methods: {
-        ...mapActions(["addPiece", "rotatePiece", "advancePiece", "translatePiece", "startGame"]),
+        ...mapActions(["addPiece", "rotatePiece", "advancePiece", "translatePiece", "startGame", "restartGame"]),
         keypressHandler(event: KeyboardEvent) {
             switch (event.keyCode) {
                 case keyLeft:
@@ -101,6 +108,7 @@ export default Vue.extend({
                 case keyDown:
                     window.clearInterval(this.advanceTimer);
                     this.advancePiece({ isSoft: true });
+                    // restart the timer so that there isn't any accidental placement
                     this.advanceTimer = window.setInterval(this.advancePiece, this.gameTick);
                     event.preventDefault();
                     event.stopPropagation();
@@ -115,6 +123,15 @@ export default Vue.extend({
                     event.preventDefault();
                     event.stopPropagation();
                     break;
+                case keySpace:
+                    this.pauseGame();
+                    event.preventDefault();
+                    event.stopPropagation();
+                    break;
+                case keyEscape:
+                    event.preventDefault();
+                    event.stopPropagation();
+                    break;
             }
         },
         hardDropPiece() {
@@ -122,16 +139,13 @@ export default Vue.extend({
         },
     },
     computed: {
-        ...mapState({
-            level: (state: any) => state.scoreStore.level,
-            lines: (state: any) => state.scoreStore.lines,
-            score: (state: any) => state.scoreStore.score,
-            pieceQueue: (state: any) => state.boardStore.pieceQueue,
-            activePiece: (state: any) => state.boardStore.activePiece,
-            isRemovingRows: (state: any) => state.boardStore.isRemovingRows,
-            isStarted: (state: any) => state.scoreStore.isStarted,
-            isEnded: (state: any) => state.scoreStore.isEnded,
-        }),
+        level(): number { return this.$store.state.scoreStore.level; },
+        lines(): number { return this.$store.state.scoreStore.lines; },
+        score(): number { return this.$store.state.scoreStore.score; },
+        pieceQueue(): Piece[] { return this.$store.state.boardStore.pieceQueue; },
+        activePiece(): Piece { return this.$store.state.boardStore.activePiece; },
+        isStarted(): boolean { return this.$store.state.scoreStore.isStarted; },
+        isEnded(): boolean { return this.$store.state.scoreStore.isEnded; },
         gameTick(): number {
             return Math.pow(0.8 - ((this.level - 1) * 0.007), this.level - 1) * 1000;
         },

@@ -8,22 +8,22 @@ export const mutations: MutationTree<BoardState> = {
   // [mutations.SET_ACTIVE_PIECE](state: State, piece: Shape) {
   //   Vue.set(state, "activePiece", piece);
   // },
-  [mutation.DEQUEUE_PIECE](state: BoardState, newPiece: Piece) {
+  [mutation.DEQUEUE_PIECE](state, newPiece: Piece) {
     state.pieceQueue.push(newPiece);
     const piece = state.pieceQueue.shift();
     Vue.set(state, "activePiece", piece);
   },
-  [mutation.ADD_PIECE]({ pieceQueue }: BoardState, piece: Piece) {
+  [mutation.ADD_PIECE]({ pieceQueue }, piece: Piece) {
     pieceQueue.push(piece);
   },
-  [mutation.ROTATE_PIECE]({ activePiece }: BoardState, newPosition: number) {
+  [mutation.ROTATE_PIECE]({ activePiece }, newPosition: number) {
     if (activePiece === null) {
       return;
     }
 
     activePiece.maskPosition = newPosition;
   },
-  [mutation.TRANSLATE_PIECE]({ activePiece }: BoardState, {x = 0, y = 0}) {
+  [mutation.TRANSLATE_PIECE]({ activePiece }, {x = 0, y = 0}) {
     if (activePiece === null) {
       return;
     }
@@ -31,7 +31,7 @@ export const mutations: MutationTree<BoardState> = {
     activePiece.x += x;
     activePiece.y += y;
   },
-  [mutation.SET_PIECE](state: BoardState, gameBoardLayer: number[]) {
+  [mutation.SET_PIECE](state, gameBoardLayer: number[]) {
     const { gameBoard, activePiece, shapes } = state;
     if (activePiece === null) {
       return;
@@ -45,14 +45,14 @@ export const mutations: MutationTree<BoardState> = {
 
     Vue.set(state, "activePiece", null);
   },
-  [mutation.REMOVE_ROWS]({ gameBoard, shapes, isRemovingRows }: BoardState, rows: number[]) {
+  [mutation.REMOVE_ROWS]({ gameBoard, shapes, isRemovingRows }, rows: number[]) {
     isRemovingRows = true;
 
     rows.forEach((row) => {
       gameBoard.splice(row, 1);
     });
   },
-  [mutation.ADD_ROWS]({ gameBoard, shapes, isRemovingRows }: BoardState, rows: number) {
+  [mutation.ADD_ROWS]({ gameBoard, shapes, isRemovingRows }, rows: number) {
     for (let x = 0; x < rows; x++) {
       const row: GameRow = Object.keys(shapes).map(() => 0x0000000000);
       row.id = guid();
@@ -61,7 +61,7 @@ export const mutations: MutationTree<BoardState> = {
 
     isRemovingRows = false;
   },
-  [mutation.DROP_PIECE]({ activePiece }: BoardState, { isSoft, isHard }: AdvancePieceType) {
+  [mutation.DROP_PIECE]({ activePiece }, { isSoft, isHard }: AdvancePieceType) {
     if (activePiece === null) {
       return;
     }
@@ -72,14 +72,21 @@ export const mutations: MutationTree<BoardState> = {
       activePiece.softDrops++;
     }
   },
-  [mutation.CLEAR_BOARD]({ gameBoard }: BoardState) {
+  [mutation.CLEAR_BOARD]({ gameBoard }) {
     gameBoard.splice(0, gameBoard.length);
   },
-  [mutation.FILL_BOARD]({ boardColumns, boardRows, gameBoard, shapes }: BoardState) {
+  [mutation.FILL_BOARD]({ boardColumns, boardRows, gameBoard, shapes }) {
     for (let i = 0; i < boardRows; i++) {
       const row: GameRow = Object.keys(shapes).map(() => 0x0000000000);
       row.id = guid();
       gameBoard.push(row);
     }
-  }
+  },
+  [mutation.FILL_PIECE_QUEUE]({ pieceQueue }, newQueue: Piece[]) {
+    pieceQueue.push(...newQueue)
+    // pieceQueue.splice(0, pieceQueue.length, ...newQueue);
+  },
+  [mutation.FLUSH_PIECE_QUEUE]({ pieceQueue }) {
+    pieceQueue.splice(0, pieceQueue.length);
+  },
 };

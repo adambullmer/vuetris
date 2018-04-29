@@ -4,7 +4,7 @@ import { ActionTree } from "vuex";
 import { RootState } from "@/store/types";
 
 export const actions: ActionTree<ScoreState, RootState> = {
-    addScore({ commit, state }: Context, modifier: ScoreReasons) {
+    addScore({ commit, state }, modifier: ScoreReasons) {
         const { level } = state;
         let points = 0;
 
@@ -21,13 +21,15 @@ export const actions: ActionTree<ScoreState, RootState> = {
         commit(mutations.ADD_SCORE, points);
     },
 
-    completeLines({ commit, state, dispatch }: Context, lines: number) {
+    completeLines({ commit, state, dispatch }, lines: number) {
         let total = 1;
         switch (lines) {
             case 4:
                 total += 3;
+                // falls-through
             case 3:
                 total += 2;
+                // falls-through
             case 2:
                 total += 2;
         }
@@ -42,18 +44,27 @@ export const actions: ActionTree<ScoreState, RootState> = {
         dispatch("addScore", { lines: total });
     },
 
-    startGame({ dispatch, commit }: Context) {
-        dispatch("fillBoard");
-
-        dispatch("addPiece");
-        dispatch("addPiece");
-        dispatch("addPiece");
-        dispatch("addPiece");
+    async startGame({ dispatch, commit, state }) {
+        await dispatch("clearBoard");
+        await dispatch("fillPieceQueue");
+        await dispatch("addPiece");
 
         commit(mutations.START_GAME);
     },
 
-    endGame({ commit }: Context) {
+    async restartGame({ dispatch, commit, state }) {
+        await dispatch("clearBoard");
+        await dispatch("fillPieceQueue");
+
+        commit(mutations.START_GAME);
+    },
+
+    endGame({ commit, dispatch }) {
+        dispatch("flushPieceQueue");
         commit(mutations.END_GAME);
+    },
+
+    pauseGame({ commit }) {
+        commit(mutations.PAUSE_GAME);
     },
 };

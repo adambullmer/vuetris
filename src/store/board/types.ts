@@ -6,6 +6,9 @@ export type PieceQueue = Piece[];
 export interface GameRow {
   id?: string;
   [layer: number]: number;
+  readonly forEach: (
+    callbackfn: (currentItem: number, currentIndex: number, array: number[]) => void,
+  ) => void;
   readonly reduce: (
     callbackfn: (previousValue: number, currentValue: number, currentIndex: number, array: number[]) => number,
     initialValue: number,

@@ -18,7 +18,6 @@ const shapes = {
 const boardColumns = 10;
 const boardRows = 20;
 const gameBoard: GameRow[] = [];
-const piece = { x: 0, y: 0, softDrops: 0, hardDrops: 0, maskPosition: 0, shape: { name: "Tetromino", mask: [0x0000]} };
 
 const state: BoardState = {
   pieceQueue: [],

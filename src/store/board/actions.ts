@@ -1,10 +1,13 @@
 import * as mutations from "./mutation_types";
-import { Context, Piece, Shape, GameRow, AdvancePieceType, BoardState } from "./types";
+import { Piece, Shape, GameRow, AdvancePieceType, BoardState } from "./types";
 import { ActionTree } from "vuex";
 import { RootState } from "@/store/types";
+import _ from "lodash";
 
 const MAX_BIT = Math.pow(2, 10) - 1;
-const newPiece = (shape: Shape, x: number, y: number) => ({ x, y, softDrops: 0, hardDrops: 0, maskPosition: 0, shape });
+const PIECE_QUEUE_LENGTH = 3;
+const pieceFactory: (shape: Shape, x: number, y: number) => Piece = (shape: Shape, x: number, y: number) =>
+    ({ x, y, softDrops: 0, hardDrops: 0, maskPosition: 0, shape });
 const clonePiece: (piece: Piece) => Piece =
     ({ x, y, softDrops, hardDrops, maskPosition, shape }) => ({ x, y, softDrops, hardDrops, maskPosition, shape });
 
@@ -66,15 +69,24 @@ export const actions: ActionTree<BoardState, RootState> = {
     /////////////////
     // Piece Queue //
     /////////////////
-    shiftPieces({ commit, state }: Context, nextPiece: Piece) {
-        if (state.pieceQueue.length < 3) {
-            commit(mutations.ADD_PIECE, nextPiece);
-            return;
-        }
-
+    shiftPieces({ commit, state }, nextPiece: Piece) {
         commit(mutations.DEQUEUE_PIECE, nextPiece);
     },
-    addPiece({ commit, dispatch, getters, state }: Context) {
+    fillPieceQueue({ commit, state, getters, dispatch }) {
+        const x = (state.boardColumns - 4) / 2;
+        const y = 0;
+        const newQueue: Piece[] = [];
+        for (let i = state.pieceQueue.length; i < PIECE_QUEUE_LENGTH; i++) {
+            newQueue.push(pieceFactory(getters.randomShape(), x, y));
+        }
+        commit(mutations.FILL_PIECE_QUEUE, newQueue);
+    },
+    flushPieceQueue({ commit, state }) {
+        commit(mutations.FLUSH_PIECE_QUEUE);
+    },
+    // FIXME: Debouncing feels like a bit of a hack for this being called too much
+    // Maybe this can be improved some.
+    addPiece: _.debounce(({ commit, dispatch, getters, state }) => {
         const x = (state.boardColumns - 4) / 2;
         const y = 0;
 
@@ -85,17 +97,17 @@ export const actions: ActionTree<BoardState, RootState> = {
             return;
         }
 
-        dispatch("shiftPieces", newPiece(getters.randomShape(), x, y));
-    },
+        dispatch("shiftPieces", pieceFactory(getters.randomShape(), x, y));
+    }, 10),
     ////////////////////
     // Piece Movement //
     ////////////////////
-    advancePiece({ commit, dispatch }: Context, { isSoft, isHard }: AdvancePieceType = {}) {
+    advancePiece({ commit, dispatch }, { isSoft, isHard }: AdvancePieceType = {}) {
         dispatch("translatePiece", { y: 1 });
         commit(mutations.DROP_PIECE, { isSoft, isHard });
     },
 
-    rotatePiece( { commit, state }: Context, direction: number ) {
+    rotatePiece({ commit, state }, direction: number ) {
         if (state.activePiece === null) {
             return;
         }
@@ -118,7 +130,7 @@ export const actions: ActionTree<BoardState, RootState> = {
         commit(mutations.ROTATE_PIECE, nextPosition);
     },
 
-    translatePieceasync ({ dispatch, commit, state }: Context, {x = 0, y = 0}) {
+    translatePiece({ dispatch, commit, state }, {x = 0, y = 0}) {
         if (state.activePiece === null) {
             return;
         }
@@ -141,15 +153,21 @@ export const actions: ActionTree<BoardState, RootState> = {
     ////////////////////////
     // Board Modification //
     ////////////////////////
-    clearBoard({ commit }: Context) {
+    clearBoard({ commit, dispatch, state }) {
+        if (state.gameBoard.length === 0) {
+            dispatch("fillBoard");
+
+            return;
+        }
+
         commit(mutations.CLEAR_BOARD);
     },
 
-    fillBoard({ commit }: Context) {
+    fillBoard({ commit }) {
         commit(mutations.FILL_BOARD);
     },
 
-    setPiece({ commit, state, dispatch }: Context) {
+    setPiece({ commit, state, dispatch }) {
         const { gameBoard, activePiece, layers } = state;
 
         if (activePiece === null) {
@@ -190,7 +208,7 @@ export const actions: ActionTree<BoardState, RootState> = {
         commit(mutations.SET_PIECE, newGameBoard);
     },
 
-    clearRows({ commit, state, dispatch }: Context) {
+    clearRows({ commit, state, dispatch }) {
         const { gameBoard } = state;
 
         const completedRows: number[] = [];
@@ -212,10 +230,13 @@ export const actions: ActionTree<BoardState, RootState> = {
         commit(mutations.REMOVE_ROWS, completedRows);
     },
 
-    addRows({ commit, state, dispatch }: Context) {
-        const { gameBoard, boardRows } = state;
-
-        commit(mutations.ADD_ROWS, boardRows - gameBoard.length);
+    /**
+     * Gets called for each line that is removed. In the event that multiple lines are
+     * removed, this is called multiple times;
+     * @param actionContext
+     */
+    addRows({ commit, state, dispatch }) {
+        commit(mutations.ADD_ROWS, 1);
         dispatch("addPiece");
     },
 };

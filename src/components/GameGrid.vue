@@ -8,12 +8,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapActions, mapState, MapperForState, mapGetters } from "vuex";
-import { RootState } from "../store/types";
-import { BoardState } from "../store/board/types";
-import { Piece, State } from "@/store/board/types";
+import { mapActions, Store } from "vuex";
+import { GameRow } from "../store/board/types";
+import { Piece } from "@/store/board/types";
 
 import GameCell from "@/components/GameCell.vue";
+import { RootState } from "@/store/types";
 
 interface Cell {
   name: string;
@@ -25,58 +25,58 @@ export default Vue.extend({
   name: "GameGrid",
   computed: {
     renderedGrid(): CellGrid {
-      const gameGrid: number[][] = this.gameGrid;
-      const maskNameMap: string[] = this.maskNameMap;
       const grid: CellGrid = [];
-
-      this.rows
-
       let bit = 1;
+
       // build current board without active piece overlay
-      for (let rowIndex = 0; rowIndex < gameGrid.length; rowIndex++, bit = 1) {
+      for (let rowIndex = 0; rowIndex < this.gameGrid.length; rowIndex++, bit = 1) {
         const row: Cell[] = [];
         // tslint:disable-next-line:no-bitwise
         for (let columnIndex = this.columns; columnIndex > 0; columnIndex--, bit <<= 1) {
           const cell = { name: "" };
-          gameGrid[rowIndex].forEach((rowMask, index) => {
-            // tslint:disable-next-line:no-bitwise
-            if (bit & rowMask) {
-              cell.name = maskNameMap[index];
-            }
-          });
+
+          if (this.isEnded === true) {
+            cell.name = "Tetromino";
+          } else {
+            this.gameGrid[rowIndex].forEach((rowMask, index) => {
+                // tslint:disable-next-line:no-bitwise
+              if (bit & rowMask) {
+                cell.name = this.maskNameMap[index];
+              }
+            });
+          }
 
           row.unshift(cell);
         }
         grid.push(row);
       }
 
-      const piece: Piece = this.piece;
-      if (piece === null) {
+      if (this.piece === null) {
         return grid;
       }
 
-      const mask = piece.shape.mask[piece.maskPosition];
+      const mask = this.piece.shape.mask[this.piece.maskPosition];
       bit = 1;
 
-      for (let row = piece.y + 4; row > piece.y; row--) {
+      for (let row = this.piece.y + 4; row > this.piece.y; row--) {
         // tslint:disable-next-line:no-bitwise
-        for (let column = piece.x + 4; column > piece.x; column--, bit <<= 1) {
+        for (let column = this.piece.x + 4; column > this.piece.x; column--, bit <<= 1) {
           // tslint:disable-next-line:no-bitwise
           if (mask & bit) {
-            grid[row - 1][column - 1].name = piece.shape.name;
+            grid[row - 1][column - 1].name = this.piece.shape.name;
           }
         }
       }
 
       return grid;
     },
-    ...mapState({
-      rows(state: RootState) { return state.boardStore.; },
-      columns: ({ boardStore }) => boardStore.boardColumns,
-      gameGrid: ({ boardStore }) => boardStore.gameBoard,
-      maskNameMap: ({ boardStore }) => Object.keys(boardStore.shapes),
-      piece: ({ boardStore }) => boardStore.activePiece,
-    }),
+    store(): Store<RootState> { return this.$store; },
+    rows(): number { return this.store.state.boardStore.boardRows; },
+    columns(): number { return this.store.state.boardStore.boardColumns; },
+    gameGrid(): GameRow[] { return this.store.state.boardStore.gameBoard; },
+    maskNameMap(): string[] { return Object.keys(this.store.state.boardStore.shapes); },
+    piece(): Piece | null { return this.store.state.boardStore.activePiece; },
+    isEnded(): boolean { return this.store.state.scoreStore.isEnded; },
   },
   methods: {
     ...mapActions(["addRows"]),

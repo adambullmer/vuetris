@@ -1,7 +1,7 @@
 import { ActionContext } from "vuex";
 
-export type Context = ActionContext<State, {}>;
-export interface State {
+export type Context = ActionContext<ScoreState, {}>;
+export interface ScoreState {
     lines: number;
     level: number;
     score: number;

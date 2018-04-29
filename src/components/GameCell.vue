@@ -4,7 +4,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapState, Store } from "vuex";
+import { RootState } from "@/store/types";
 
 export default Vue.extend({
     name: "GameCell",
@@ -15,8 +16,8 @@ export default Vue.extend({
     },
     computed: {
         ...mapState({
-            layers: ({ boardStore }: any) => boardStore.layers,
-            gameBoard: ({ boardStore }: any) => boardStore.gameBoard,
+            layers: ({ boardStore }: RootState) => boardStore.layers,
+            gameBoard: ({ boardStore }: RootState) => boardStore.gameBoard,
         }),
         columnBit(): number {
             // tslint:disable-next-line:no-bitwise
@@ -52,7 +53,7 @@ export default Vue.extend({
 }
 
 .shapeTetromino {
-    background-color: black;
+    background-color: gray;
 }
 .shapeI {
     background-color: cyan;
