@@ -25,12 +25,15 @@ Installation
 Improvements and Features
 -------------------------
 
+- [ ] Sleeker animations
+- [ ] Better UI and layout for game
 - [ ] Animate game over
 - [ ] mobile ui components
 - [ ] Repeating commands on held keys (and components)
 - [ ] Pause/Unpause active game
 - [ ] End current game (not by losing)
 - [ ] Local/Global Leader Boards
+- [ ] Preview hard drop position
 
 Known Bugs
 ----------

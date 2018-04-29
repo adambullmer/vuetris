@@ -12,13 +12,12 @@
                     </figure>
                 </section>
                 <section id="score_section">
-                    <button @click="addPiece">+ Piece</button>
-                    <button @click="startGame">Start</button>
                     <div id="lines">lines: {{ lines }}</div>
                     <div id="level">level: {{ level }}</div>
                     <div id="score">score: {{ score }}</div>
                 </section>
             </aside>
+            <game-buttons></game-buttons>
         </div>
         <div class="modal" v-if="isEnded">
             <div class="modal-content">
@@ -31,21 +30,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapActions, Store } from "vuex";
+import { mapActions } from "vuex";
 import { Piece } from "@/store/board/types";
 import GameGrid from "@/components/GameGrid.vue";
+import GameButtons from "@/components/GameButtons.vue";
 import TetrominoPreview from "@/components/TetrominoPreview.vue";
-import { PerformanceObserver } from "perf_hooks";
 
-const keyLeft = 37;
-const keyUp = 38;
-const keyRight = 39;
-const keyDown = 40;
-const keyCtrl = 17;
-const keyShift = 16;
-const keyEscape = 27;
-const keySpace = 32;
-const keyEnter = 13;
+
 
 interface LocalState {
     advanceTimer: number;
@@ -58,11 +49,7 @@ export default Vue.extend({
             advanceTimer: 0,
         };
     },
-    mounted() {
-        window.addEventListener("keyup", this.keypressHandler);
-    },
     destroyed() {
-        window.removeEventListener("keyup", this.keypressHandler);
         window.clearInterval(this.advanceTimer);
     },
     watch: {
@@ -76,7 +63,7 @@ export default Vue.extend({
             if (newValue === false) {
                 window.clearInterval(this.advanceTimer);
             // } else {
-                // this.advanceTimer = window.setInterval(this.advancePiece, this.gameTick);
+            //     this.advanceTimer = window.setInterval(this.advancePiece, this.gameTick);
             }
         },
         isEnded(newValue) {
@@ -86,57 +73,7 @@ export default Vue.extend({
         },
     },
     methods: {
-        ...mapActions(["addPiece", "rotatePiece", "advancePiece", "translatePiece", "startGame", "restartGame"]),
-        keypressHandler(event: KeyboardEvent) {
-            switch (event.keyCode) {
-                case keyLeft:
-                    this.translatePiece({ x: -1 });
-                    event.preventDefault();
-                    event.stopPropagation();
-                    break;
-                case keyRight:
-                    this.translatePiece({ x: 1 });
-                    event.preventDefault();
-                    event.stopPropagation();
-                    break;
-                case keyUp:
-                    window.clearInterval(this.advanceTimer);
-                    this.advanceTimer = window.setInterval(this.hardDropPiece, 10);
-                    event.preventDefault();
-                    event.stopPropagation();
-                    break;
-                case keyDown:
-                    window.clearInterval(this.advanceTimer);
-                    this.advancePiece({ isSoft: true });
-                    // restart the timer so that there isn't any accidental placement
-                    this.advanceTimer = window.setInterval(this.advancePiece, this.gameTick);
-                    event.preventDefault();
-                    event.stopPropagation();
-                    break;
-                case keyShift:
-                    this.rotatePiece(1);
-                    event.preventDefault();
-                    event.stopPropagation();
-                    break;
-                case keyCtrl:
-                    this.rotatePiece(-1);
-                    event.preventDefault();
-                    event.stopPropagation();
-                    break;
-                case keySpace:
-                    this.pauseGame();
-                    event.preventDefault();
-                    event.stopPropagation();
-                    break;
-                case keyEscape:
-                    event.preventDefault();
-                    event.stopPropagation();
-                    break;
-            }
-        },
-        hardDropPiece() {
-            this.advancePiece({ isHard: true });
-        },
+        ...mapActions(["advancePiece", "restartGame"]),
     },
     computed: {
         level(): number { return this.$store.state.scoreStore.level; },
@@ -150,7 +87,7 @@ export default Vue.extend({
             return Math.pow(0.8 - ((this.level - 1) * 0.007), this.level - 1) * 1000;
         },
     },
-    components: { GameGrid, TetrominoPreview },
+    components: { GameGrid, TetrominoPreview, GameButtons },
 });
 </script>
 

@@ -88,7 +88,7 @@ export default Vue.extend({
 <style scoped lang="scss">
 .gameboard {
   // The content width you use on your website
-  --content-width: 400px;
+  --content-width: 300px;
   --gutter: 0;
   // The amount of columns
   --columns: 10;
