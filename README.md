@@ -25,15 +25,29 @@ Installation
 Improvements and Features
 -------------------------
 
+- [ ] Wall Kicks
+- [ ] T-Spin Detection
 - [ ] Sleeker animations
 - [ ] Better UI and layout for game
 - [ ] Animate game over
-- [ ] mobile ui components
+- [x] mobile ui components
 - [ ] Repeating commands on held keys (and components)
 - [ ] Pause/Unpause active game
-- [ ] End current game (not by losing)
+- [x] End current game (not by losing)
 - [ ] Local/Global Leader Boards
 - [ ] Preview hard drop position
+- [ ] Adjustable starting level
+- [ ] Instructions / Controlls Screen
+- [ ] Held piece swap
+- [ ] Sound Effects / Music
+
+Advanced Features
+-----------------
+
+- [ ] Per-pixel movement
+- [ ] Animate movement (motion blur)
+- [ ] Hold actions for buttons
+- [ ] Hold Action for hard drop (On end press, stop hard dropping)
 
 Known Bugs
 ----------
