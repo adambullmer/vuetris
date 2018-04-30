@@ -17,6 +17,10 @@ html {
 }
 body {
   font-size: 1.6rem;
+  margin: 0;
+}
+figure {
+  margin: 0;
 }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;

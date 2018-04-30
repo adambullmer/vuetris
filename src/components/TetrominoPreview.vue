@@ -62,7 +62,7 @@ export default Vue.extend({
 <style scoped lang="scss">
 .gameboard {
   // The content width you use on your website
-  --content-width: 125px;
+  --content-width: 64px;
 
   // The amount of columns
   --columns: 4;
@@ -81,13 +81,13 @@ export default Vue.extend({
   width: 100%;
   max-width: var(--content-width);
 
-  grid-auto-rows: repeat(var(--rows), minmax(30px, 1fr));
+  grid-auto-rows: repeat(var(--rows), minmax(10px, 1fr));
 
   height: calc(var(--content-width) * var(--rows) / var(--columns));
   border: 1px solid black;
 }
 .row {
   display: grid;
-  grid-template-columns: repeat(var(--columns), minmax(30px, 1fr));
+  grid-template-columns: repeat(var(--columns), minmax(10px, 1fr));
 }
 </style>

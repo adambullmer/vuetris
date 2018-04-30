@@ -1,18 +1,18 @@
 <template>
   <div id="game_buttons" class="game-buttons">
     <div class="direction-buttons">
-      <button @click="" style="grid-area: top; border-bottom: 0;">^</button>
-      <button @click="" style="grid-area: left; border-right: 0;">&lt;</button>
-      <button @click="" style="grid-area: right; border-left: 0;">&gt;</button>
-      <button @click="" style="grid-area: bottom; border-top: 0;">v</button>
+      <button @click="upButton" style="grid-area: top; border-bottom: 0;"><font-awesome-icon :icon="['far', 'caret-up']"></font-awesome-icon></button>
+      <button @click="leftButton" style="grid-area: left; border-right: 0;"><font-awesome-icon :icon="['far', 'caret-left']"></font-awesome-icon></button>
+      <button @click="rightButton" style="grid-area: right; border-left: 0;"><font-awesome-icon :icon="['far', 'caret-right']"></font-awesome-icon></button>
+      <button @click="downButton" style="grid-area: bottom; border-top: 0;"><font-awesome-icon :icon="['far', 'caret-down']"></font-awesome-icon></button>
+    </div>
+    <div class="rotation-buttons">
+      <button @click="clockwiseButton"><font-awesome-icon :icon="['far', 'redo-alt']"></font-awesome-icon></button>
+      <button @click="counterClockwiseButton"><font-awesome-icon :icon="['far', 'undo-alt']"></font-awesome-icon></button>
     </div>
     <div class="control-buttons">
       <button @click="selectButton">select</button>
       <button @click="startButton">start</button>
-    </div>
-    <div class="rotation-buttons">
-      <button @click="">A</button>
-      <button @click="">B</button>
     </div>
   </div>
 </template>
@@ -20,6 +20,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapActions } from "vuex";
+import FontAwesomeIcon from "@fortawesome/vue-fontawesome";
 
 const keyLeft = 37;
 const keyUp = 38;
@@ -42,48 +43,74 @@ export default Vue.extend({
   methods: {
     ...mapActions(["translatePiece", "advancePiece", "rotatePiece", "startGame", "pauseGame", "endGame"]),
     keypressHandler(event: KeyboardEvent) {
+      function stopEvent() {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+
       switch (event.keyCode) {
         case keyLeft:
-          this.translatePiece({ x: -1 });
-          event.preventDefault();
-          event.stopPropagation();
+          this.leftButton();
+          stopEvent();
           break;
         case keyRight:
-          this.translatePiece({ x: 1 });
-          event.preventDefault();
-          event.stopPropagation();
+          this.rightButton();
+          stopEvent();
           break;
         case keyUp:
-          event.preventDefault();
-          event.stopPropagation();
+          this.upButton();
+          stopEvent();
           break;
         case keyDown:
-          this.advancePiece({ isSoft: true });
-          event.preventDefault();
-          event.stopPropagation();
+          this.downButton();
+          stopEvent();
           break;
         case keyShift:
-          this.rotatePiece(1);
-          event.preventDefault();
-          event.stopPropagation();
+          this.clockwiseButton();
+          stopEvent();
           break;
         case keyCtrl:
-          this.rotatePiece(-1);
-          event.preventDefault();
-          event.stopPropagation();
+          this.counterClockwiseButton();
+          stopEvent();
           break;
         case keySpace:
           this.pauseGame();
-          event.preventDefault();
-          event.stopPropagation();
+          stopEvent();
           break;
         case keyEscape:
           this.endGame();
-          event.preventDefault();
-          event.stopPropagation();
+          stopEvent();
           break;
       }
     },
+
+    // Translations
+    upButton() {
+      const params = { isHard: true }
+      this.advancePiece(params);
+      this.$emit("advancePiece", params);
+    },
+    downButton() {
+      const params = { isSoft: true }
+      this.advancePiece(params);
+      this.$emit("advancePiece", params);
+    },
+    leftButton() {
+      this.translatePiece({ x: -1 });
+    },
+    rightButton() {
+      this.translatePiece({ x: 1 });
+    },
+
+    // Rotations
+    clockwiseButton() {
+      this.rotatePiece(1);
+    },
+    counterClockwiseButton() {
+      this.rotatePiece(-1);
+    },
+
+    // Game Controls
     startButton() {
       this.startGame();
     },
@@ -93,7 +120,8 @@ export default Vue.extend({
     hardDropPiece() {
       this.advancePiece({ isHard: true });
     },
-  }
+  },
+  components: { FontAwesomeIcon },
 });
 </script>
 
@@ -101,6 +129,9 @@ export default Vue.extend({
 .game-buttons {
   --button-width: 4rem;
   --button-height: 4rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(4, calc(var(--button-height) + 2px));
 }
 button {
   border: 1px solid black;
@@ -115,13 +146,22 @@ button {
   font-size: 2rem;
   cursor: pointer;
 }
-.control-buttons button {
-  width: 10rem;
-  border-radius: 2.2rem;
+.control-buttons {
+  grid-area: 1 / 2 / 2 / 3;
+
+  button {
+    width: 6rem;
+    border-radius: 2.2rem;
+    font-size: 1rem;
+  }
 }
-.rotation-buttons button {
-  border-radius: 50%;
-  clip-path: circle(calc(50% + 5px) at center)
+.rotation-buttons {
+  grid-area: 3 / 2 / 4 / 3;
+
+  button {
+    border-radius: 50%;
+    clip-path: circle(calc(50% + 5px) at center)
+  }
 }
 
 .rotation-buttons, .control-buttons {
@@ -132,6 +172,8 @@ button {
 }
 
 .direction-buttons {
+  grid-area: 1 / 1 / 4 / 2;
+  margin: 0 auto;
   display: grid;
   grid-auto-columns: repeat(3, var(--button-width));
   grid-auto-rows: repeat(3, var(--button-height));;

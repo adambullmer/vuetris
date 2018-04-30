@@ -2,22 +2,32 @@
     <div>
         <h1>Vuetris</h1>
         <div id="game_wrapper">
-            <game-grid ref="mainGame"></game-grid>
-
-            <aside id="side_panel">
-                <section id="piece_preview_section">
-                    <div>Next Up:</div>
-                    <figure v-for="(piece, index) in pieceQueue" :key="index">
-                        <tetromino-preview :piece="piece" v-show="isStarted"></tetromino-preview>
+            <aside id="hold_panel">
+                <section>
+                    <div>Hold:</div>
+                    <figure>
+                        <tetromino-preview :piece="holdQueue[0]" v-show="isStarted"></tetromino-preview>
                     </figure>
                 </section>
+            </aside>
+            <aside id="score_panel">
                 <section id="score_section">
                     <div id="lines">lines: {{ lines }}</div>
                     <div id="level">level: {{ level }}</div>
                     <div id="score">score: {{ score }}</div>
                 </section>
             </aside>
-            <game-buttons></game-buttons>
+            <game-grid ref="mainGame"></game-grid>
+            <aside id="queue_panel">
+                <section id="piece_preview_section">
+                    <div>Next:</div>
+                    <figure v-for="(piece, index) in pieceQueue" :key="index">
+                        <tetromino-preview :piece="piece" v-show="isStarted"></tetromino-preview>
+                    </figure>
+                </section>
+            </aside>
+
+            <game-buttons @advancePiece="advancePieceHandler" ref="gameButtons"></game-buttons>
         </div>
         <div class="modal" v-if="isEnded">
             <div class="modal-content">
@@ -36,11 +46,12 @@ import GameGrid from "@/components/GameGrid.vue";
 import GameButtons from "@/components/GameButtons.vue";
 import TetrominoPreview from "@/components/TetrominoPreview.vue";
 
-
-
 interface LocalState {
     advanceTimer: number;
 }
+
+const isSoft = true;
+const isHard = true;
 
 export default Vue.extend({
     name: "Game",
@@ -50,30 +61,47 @@ export default Vue.extend({
         };
     },
     destroyed() {
-        window.clearInterval(this.advanceTimer);
+        this.resetTimer();
     },
     watch: {
         activePiece(newValue) {
-            window.clearInterval(this.advanceTimer);
+            this.resetTimer();
             if (newValue !== null && this.isEnded === false) {
-                this.advanceTimer = window.setInterval(this.advancePiece, this.gameTick);
+                this.defaultTimer();
             }
         },
         isStarted(newValue) {
             if (newValue === false) {
-                window.clearInterval(this.advanceTimer);
+                this.resetTimer();
             // } else {
             //     this.advanceTimer = window.setInterval(this.advancePiece, this.gameTick);
             }
         },
         isEnded(newValue) {
             if (newValue === true) {
-                window.clearInterval(this.advanceTimer);
+                this.resetTimer();
             }
         },
     },
     methods: {
         ...mapActions(["advancePiece", "restartGame"]),
+        resetTimer() {
+            window.clearInterval(this.advanceTimer);
+        },
+        defaultTimer() {
+            this.advanceTimer = window.setInterval(this.advancePiece, this.gameTick);
+        },
+        dropTimer() {
+            this.advanceTimer = window.setInterval(this.advancePiece.bind(null, { isHard }), 1000 / 60);
+        },
+        advancePieceHandler(payload: { isSoft: boolean, isHard: boolean }) {
+            this.resetTimer();
+            if (payload.isSoft) {
+                this.defaultTimer();
+            } else if (payload.isHard) {
+                this.dropTimer();
+            }
+        },
     },
     computed: {
         level(): number { return this.$store.state.scoreStore.level; },
@@ -81,6 +109,7 @@ export default Vue.extend({
         score(): number { return this.$store.state.scoreStore.score; },
         pieceQueue(): Piece[] { return this.$store.state.boardStore.pieceQueue; },
         activePiece(): Piece { return this.$store.state.boardStore.activePiece; },
+        holdQueue(): Piece[] { return this.$store.state.boardStore.holdQueue; },
         isStarted(): boolean { return this.$store.state.scoreStore.isStarted; },
         isEnded(): boolean { return this.$store.state.scoreStore.isEnded; },
         gameTick(): number {
@@ -93,27 +122,48 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 #game_wrapper {
-    width: 100vw;
-    max-width: 660px;
+    --preview-width: 64px;
+    --gameboard-width: 200px;
+    // width: calc(var(--preview-width) + var(--gameboard-width) + var(--preview-width));
+    max-width: 100vw;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 500px 160px;
+    grid-template-areas:
+        'left1  center right'
+        'left2  center right'
+        'bottom bottom bottom';
+    grid-template-columns: var(--preview-width) var(--gameboard-width) var(--preview-width);
 }
-#side_panel {
-    padding: 20px;
-    text-align: left;
+#hold_panel {
+    grid-area: left1;
+}
+#score_panel {
+    grid-area: left2;
+}
+#queue_panel {
+    grid-area: right;
 }
 #piece_preview_section figure {
-    margin-left: 0;
-    margin-right: 0;
+    margin: 0;
 }
+
+#game_wrapper {
+    >>> .game-buttons {
+        grid-column-start: 1;
+        grid-column-end: 4;
+    }
+    >>> .gameboard {
+        grid-area: center;
+    }
+}
+
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 .modal-content {
     position: relative;

@@ -37,7 +37,7 @@ const checkNextPosition: (gameBoard: GameRow[], piece: Piece) => boolean = (game
             rowMask <<= shifter;
         } else if (shifter < 0) {
             const originalMask = rowMask;
-            const positiveShifter = Math.abs(shifter)
+            const positiveShifter = Math.abs(shifter);
 
             // tslint:disable-next-line:no-bitwise
             rowMask >>= positiveShifter;

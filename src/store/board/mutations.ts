@@ -83,7 +83,7 @@ export const mutations: MutationTree<BoardState> = {
     }
   },
   [mutation.FILL_PIECE_QUEUE]({ pieceQueue }, newQueue: Piece[]) {
-    pieceQueue.push(...newQueue)
+    pieceQueue.push(...newQueue);
     // pieceQueue.splice(0, pieceQueue.length, ...newQueue);
   },
   [mutation.FLUSH_PIECE_QUEUE]({ pieceQueue }) {

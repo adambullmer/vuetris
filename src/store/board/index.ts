@@ -4,7 +4,6 @@ import { getters } from "./getters";
 import { mutations } from "./mutations";
 import { BoardState, GameRow } from "./types";
 import { RootState } from "@/store/types";
-import { guid } from "@/utils";
 
 const shapes = {
   I: [0x0F00, 0x2222, 0x00F0, 0x4444],
@@ -22,6 +21,7 @@ const gameBoard: GameRow[] = [];
 const state: BoardState = {
   pieceQueue: [],
   activePiece: null,
+  holdQueue: [],
   boardColumns,
   boardRows,
   gameBoard,

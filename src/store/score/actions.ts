@@ -1,5 +1,5 @@
 import * as mutations from "./mutation_types";
-import { Context, ScoreReasons, ScoreState } from "./types";
+import { ScoreReasons, ScoreState } from "./types";
 import { ActionTree } from "vuex";
 import { RootState } from "@/store/types";
 
