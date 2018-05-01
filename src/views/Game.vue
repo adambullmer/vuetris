@@ -122,9 +122,9 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 #game_wrapper {
-    --preview-width: 64px;
-    --gameboard-width: 200px;
-    // width: calc(var(--preview-width) + var(--gameboard-width) + var(--preview-width));
+    --preview-width: 15vw;
+    --gameboard-width: 70vw;
+
     max-width: 100vw;
     margin: 0 auto;
     display: grid;
@@ -132,7 +132,7 @@ export default Vue.extend({
         'left1  center right'
         'left2  center right'
         'bottom bottom bottom';
-    grid-template-columns: var(--preview-width) var(--gameboard-width) var(--preview-width);
+    grid-template-columns: 15vw 70vw 15vw;
 }
 #hold_panel {
     grid-area: left1;

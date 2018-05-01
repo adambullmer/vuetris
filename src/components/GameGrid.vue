@@ -87,31 +87,16 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 .gameboard {
-  // The content width you use on your website
-  --content-width: 200px;
-  --gutter: 0;
   // The amount of columns
   --columns: 10;
   --rows: 20;
 
-  // This is the calculation for the row height.
-  --row-size: calc(
-     (var(--content-width) - (var(--gutter) * (var(--columns) - 1))) /
-      var(--columns)
-  );
-
   margin: 0 auto;
-  width: 100%;
-  max-width: var(--content-width);
-  height: calc(var(--content-width) * var(--rows) / var(--columns));
+  height: calc(100vh - 160px);
+  max-height: calc(70vw * var(--rows) / var(--columns));
+  width: calc((100vh - 160px) * var(--columns) / var(--rows));
+  max-width: 70vw;
   border: 1px solid black;
-
-  // display: grid;
-  // responsive layout, causes rows to strech
-  // grid-auto-rows: repeat(var(--rows), minmax(30px, 1fr));
-  // Static layout, causes bottom rows to jump up
-  // grid-auto-rows: calc(var(--content-width) / var(--columns));
-  // height: calc(var(--content-width) * var(--rows) / var(--columns));
 
   display: flex;
   flex-wrap: wrap;
@@ -121,8 +106,6 @@ export default Vue.extend({
   overflow: hidden;
 }
 .row {
-  // display: grid;
-  // grid-template-columns: repeat(var(--columns), minmax(30px, 1fr));
   display: flex;
   flex: 0 1 calc(100% / var(--rows));
 }

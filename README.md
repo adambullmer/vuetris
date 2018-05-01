@@ -28,7 +28,7 @@ Improvements and Features
 - [ ] Wall Kicks
 - [ ] T-Spin Detection
 - [ ] Sleeker animations
-- [ ] Better UI and layout for game
+- [x] Better UI and layout for game
 - [ ] Animate game over
 - [x] mobile ui components
 - [ ] Repeating commands on held keys (and components)

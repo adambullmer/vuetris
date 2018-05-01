@@ -131,7 +131,7 @@ export default Vue.extend({
   --button-height: 4rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(4, calc(var(--button-height) + 2px));
+  grid-template-rows: repeat(3, calc(var(--button-height) + 2px));
 }
 button {
   border: 1px solid black;
