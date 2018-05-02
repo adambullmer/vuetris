@@ -38,7 +38,7 @@ Improvements and Features
 - [ ] Preview hard drop position
 - [ ] Adjustable starting level
 - [ ] Instructions / Controlls Screen
-- [ ] Held piece swap
+- [x] Held piece swap
 - [ ] Sound Effects / Music
 
 Advanced Features
@@ -52,5 +52,4 @@ Advanced Features
 Known Bugs
 ----------
 
-- Rendering bugs around the up next pieces, and actually previewing them
 - Variant speeds around hard dropping a piece

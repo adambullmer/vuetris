@@ -22,6 +22,7 @@ const state: BoardState = {
   pieceQueue: [],
   activePiece: null,
   holdQueue: [],
+  hasHeld: false,
   boardColumns,
   boardRows,
   gameBoard,

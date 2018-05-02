@@ -19,6 +19,7 @@ export interface BoardState {
   pieceQueue: PieceQueue;
   activePiece: Piece | null;
   holdQueue: PieceQueue;
+  hasHeld: boolean;
   boardColumns: number;
   boardRows: number;
   gameBoard: GameRow[];

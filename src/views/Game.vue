@@ -22,7 +22,7 @@
                 <section id="piece_preview_section">
                     <div>Next:</div>
                     <figure v-for="(piece, index) in pieceQueue" :key="index">
-                        <tetromino-preview :piece="piece" v-show="isStarted"></tetromino-preview>
+                        <tetromino-preview :piece="piece" v-if="isStarted"></tetromino-preview>
                     </figure>
                 </section>
             </aside>

@@ -11,3 +11,4 @@ export const ADD_ROWS = "ADD_ROWS";
 export const DROP_PIECE = "DROP_PIECE";
 export const CLEAR_BOARD = "CLEAR_BOARD";
 export const FILL_BOARD = "FILL_BOARD";
+export const HOLD_PIECE = "HOLD_PIECE";

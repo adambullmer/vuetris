@@ -99,6 +99,27 @@ export const actions: ActionTree<BoardState, RootState> = {
 
         dispatch("shiftPieces", pieceFactory(getters.randomShape(), x, y));
     }, 10),
+    holdPiece({ commit, dispatch, state }) {
+        if (state.activePiece === null) {
+            return;
+        }
+
+        if (state.hasHeld) {
+            return;
+        }
+
+        const heldPiece = state.holdQueue[0];
+        const newHeldPiece = clonePiece(state.activePiece);
+
+        newHeldPiece.x = (state.boardColumns - 4) / 2;
+        newHeldPiece.y = 0;
+
+        commit(mutations.HOLD_PIECE, newHeldPiece);
+
+        if (heldPiece === undefined) {
+            dispatch("addPiece");
+        }
+    },
     ////////////////////
     // Piece Movement //
     ////////////////////

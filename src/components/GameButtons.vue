@@ -7,6 +7,7 @@
       <button @click="downButton" style="grid-area: bottom; border-top: 0;"><font-awesome-icon :icon="['far', 'caret-down']"></font-awesome-icon></button>
     </div>
     <div class="rotation-buttons">
+      <button @click="holdButton"><font-awesome-icon :icon="['far', 'retweet']"></font-awesome-icon></button>
       <button @click="clockwiseButton"><font-awesome-icon :icon="['far', 'redo-alt']"></font-awesome-icon></button>
       <button @click="counterClockwiseButton"><font-awesome-icon :icon="['far', 'undo-alt']"></font-awesome-icon></button>
     </div>
@@ -41,7 +42,7 @@ export default Vue.extend({
     window.removeEventListener("keydown", this.keypressHandler);
   },
   methods: {
-    ...mapActions(["translatePiece", "advancePiece", "rotatePiece", "startGame", "pauseGame", "endGame"]),
+    ...mapActions(["translatePiece", "advancePiece", "rotatePiece", "startGame", "pauseGame", "endGame", "holdPiece"]),
     keypressHandler(event: KeyboardEvent) {
       function stopEvent() {
         event.stopPropagation();
@@ -79,6 +80,10 @@ export default Vue.extend({
           break;
         case keyEscape:
           this.endGame();
+          stopEvent();
+          break;
+        case keyEnter:
+          this.holdButton();
           stopEvent();
           break;
       }
@@ -120,6 +125,9 @@ export default Vue.extend({
     hardDropPiece() {
       this.advancePiece({ isHard: true });
     },
+    holdButton() {
+      this.holdPiece();
+    }
   },
   components: { FontAwesomeIcon },
 });

@@ -44,6 +44,7 @@ export const mutations: MutationTree<BoardState> = {
     }
 
     Vue.set(state, "activePiece", null);
+    state.hasHeld = false;
   },
   [mutation.REMOVE_ROWS]({ gameBoard, shapes, isRemovingRows }, rows: number[]) {
     isRemovingRows = true;
@@ -84,9 +85,18 @@ export const mutations: MutationTree<BoardState> = {
   },
   [mutation.FILL_PIECE_QUEUE]({ pieceQueue }, newQueue: Piece[]) {
     pieceQueue.push(...newQueue);
-    // pieceQueue.splice(0, pieceQueue.length, ...newQueue);
   },
-  [mutation.FLUSH_PIECE_QUEUE]({ pieceQueue }) {
+  [mutation.FLUSH_PIECE_QUEUE]({ pieceQueue, holdQueue }) {
     pieceQueue.splice(0, pieceQueue.length);
+    holdQueue.splice(0, holdQueue.length);
+  },
+  [mutation.HOLD_PIECE](state, newPiece: Piece) {
+    const heldPiece = state.holdQueue.shift();
+    state.holdQueue.push(newPiece);
+    state.hasHeld = true;
+
+    if (heldPiece !== undefined) {
+      Vue.set(state, "activePiece", heldPiece);
+    }
   },
 };

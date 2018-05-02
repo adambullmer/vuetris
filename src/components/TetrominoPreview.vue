@@ -37,22 +37,31 @@ export default Vue.extend({
     return { gameGrid };
   },
   watch: {
-    piece(piece: Piece, oldPiece: Piece) {
-      if (piece.shape.name === oldPiece.shape.name) {
-        return;
-      }
-
-      const mask: number = piece.shape.mask[piece.maskPosition];
-      let bit: number = 1;
-      for (let i = this.rows; i > 0; i--) {
-        for (let j = this.columns; j > 0; j--) {
-          // tslint:disable-next-line:no-bitwise
-          const name = mask & bit ? piece.shape.name : "";
-          this.gameGrid[i - 1][j - 1].name = name;
-          // tslint:disable-next-line:no-bitwise
-          bit = bit << 1;
+    piece: {
+      immediate: true,
+      handler(piece: Piece|undefined|null, oldPiece: Piece|undefined|null) {
+        if (oldPiece && piece && piece.shape.name === oldPiece.shape.name) {
+          return;
         }
-      }
+
+        let pieceName = "";
+        let mask = 0;
+
+        if (piece) {
+          pieceName = piece.shape.name;
+          mask = piece.shape.mask[piece.maskPosition];
+        }
+
+        for (let i = this.rows; i > 0; i--) {
+          for (let j = this.columns; j > 0; j--) {
+            // tslint:disable-next-line:no-bitwise
+            const name = (mask & 1) ? pieceName : "";
+            this.gameGrid[i - 1][j - 1].name = name;
+            // tslint:disable-next-line:no-bitwise
+            mask >>= 1;
+          }
+        }
+      },
     },
   },
   components: { GameCell },
