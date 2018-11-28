@@ -23,7 +23,7 @@ export interface BoardState {
   boardColumns: number;
   boardRows: number;
   gameBoard: GameRow[];
-  shapes: { [key: string]: number[]};
+  shapes: ShapeMap<number[]>;
   layers: string[];
   isRemovingRows: boolean;
 }
@@ -43,4 +43,26 @@ export interface Piece {
 export interface AdvancePieceType {
   isSoft?: boolean;
   isHard?: boolean;
+}
+
+export interface ShapeMap<T> {
+  [index: string]: T;
+  I: T;
+  J: T;
+  L: T;
+  O: T;
+  S: T;
+  T: T;
+  Z: T;
+}
+export interface KickMap {
+  [index: string]: number[][];
+  "0->1": number[][];
+  "1->2": number[][];
+  "2->3": number[][];
+  "3->0": number[][];
+  "0<-1": number[][];
+  "1<-2": number[][];
+  "2<-3": number[][];
+  "3<-0": number[][];
 }

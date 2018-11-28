@@ -48,8 +48,14 @@ Advanced Features
 - [ ] Animate movement (motion blur)
 - [ ] Hold actions for buttons
 - [ ] Hold Action for hard drop (On end press, stop hard dropping)
+- [ ] Consistent framerate / gamem engine
 
 Known Bugs
 ----------
 
 - Variant speeds around hard dropping a piece
+
+Recources
+---------
+
+- [Tetris Wiki](http://tetris.wikia.com/wiki/Tetris_Wiki)

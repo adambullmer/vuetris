@@ -2,12 +2,12 @@ import { Module } from "vuex";
 import { actions } from "./actions";
 import { getters } from "./getters";
 import { mutations } from "./mutations";
-import { BoardState, GameRow } from "./types";
+import { BoardState, GameRow, ShapeMap } from "./types";
 import { RootState } from "@/store/types";
 
-const shapes = {
-  I: [0x0F00, 0x2222, 0x00F0, 0x4444],
+const shapes: ShapeMap<number[]> = {
   J: [0x8E00, 0x6440, 0x0E20, 0x44C0],
+  I: [0x0F00, 0x2222, 0x00F0, 0x4444],
   L: [0x2E00, 0x4460, 0x0E80, 0xC440],
   O: [0x6600, 0x6600, 0x6600, 0x6600],
   S: [0x6C00, 0x4620, 0x06C0, 0x8C40],

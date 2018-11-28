@@ -113,7 +113,7 @@ export default Vue.extend({
         isStarted(): boolean { return this.$store.state.scoreStore.isStarted; },
         isEnded(): boolean { return this.$store.state.scoreStore.isEnded; },
         gameTick(): number {
-            return Math.pow(0.8 - ((this.level - 1) * 0.007), this.level - 1) * 1000;
+            return Math.pow(0.8 - ((this.level - 1) * 0.007), this.level - 1) * 10000;
         },
     },
     components: { GameGrid, TetrominoPreview, GameButtons },

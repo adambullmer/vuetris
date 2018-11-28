@@ -16,12 +16,14 @@ export const mutations: MutationTree<BoardState> = {
   [mutation.ADD_PIECE]({ pieceQueue }, piece: Piece) {
     pieceQueue.push(piece);
   },
-  [mutation.ROTATE_PIECE]({ activePiece }, newPosition: number) {
+  [mutation.ROTATE_PIECE]({ activePiece }, newPiece: Piece) {
     if (activePiece === null) {
       return;
     }
 
-    activePiece.maskPosition = newPosition;
+    activePiece.maskPosition = newPiece.maskPosition;
+    activePiece.x = newPiece.x;
+    activePiece.y = newPiece.y;
   },
   [mutation.TRANSLATE_PIECE]({ activePiece }, {x = 0, y = 0}) {
     if (activePiece === null) {

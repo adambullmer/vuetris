@@ -1,5 +1,5 @@
 import * as mutations from "./mutation_types";
-import { Piece, Shape, GameRow, AdvancePieceType, BoardState } from "./types";
+import { Piece, Shape, GameRow, AdvancePieceType, BoardState, KickMap, ShapeMap } from "./types";
 import { ActionTree } from "vuex";
 import { RootState } from "@/store/types";
 import _ from "lodash";
@@ -10,6 +10,48 @@ const pieceFactory: (shape: Shape, x: number, y: number) => Piece = (shape: Shap
     ({ x, y, softDrops: 0, hardDrops: 0, maskPosition: 0, shape });
 const clonePiece: (piece: Piece) => Piece =
     ({ x, y, softDrops, hardDrops, maskPosition, shape }) => ({ x, y, softDrops, hardDrops, maskPosition, shape });
+const KickKey = (strings: TemplateStringsArray, start: number, direction: number, end: number) =>
+    (direction < 0) ? `${end}<-${start}` : `${start}->${end}`;
+
+const defaultKicks: KickMap = {
+    "0->1": [[0, 0], [-1, 0], [-1, -1], [0,  2], [-1,  2]],
+    "0<-1": [[0, 0], [ 1, 0], [ 1,  1], [0, -2], [ 1, -2]],
+    "1->2": [[0, 0], [ 1, 0], [ 1,  1], [0, -2], [ 1, -2]],
+    "1<-2": [[0, 0], [-1, 0], [-1, -1], [0,  2], [-1,  2]],
+    "2->3": [[0, 0], [ 1, 0], [ 1, -1], [0,  2], [ 1,  2]],
+    "2<-3": [[0, 0], [-1, 0], [-1,  1], [0, -2], [-1, -2]],
+    "3->0": [[0, 0], [-1, 0], [-1,  1], [0, -2], [-1, -2]],
+    "3<-0": [[0, 0], [ 1, 0], [ 1, -1], [0,  2], [ 1,  2]],
+};
+const shapeIKicks: KickMap = {
+    "0->1": [[0, 0], [-2, 0], [ 1, 0], [-2,  1], [ 1, -2]],
+    "0<-1": [[0, 0], [ 2, 0], [-1, 0], [ 2, -1], [-1,  2]],
+    "1->2": [[0, 0], [-1, 0], [ 2, 0], [-1, -2], [ 2,  1]],
+    "1<-2": [[0, 0], [ 1, 0], [-2, 0], [ 1,  2], [-2, -1]],
+    "2->3": [[0, 0], [ 2, 0], [-1, 0], [ 2, -1], [-1, -2]],
+    "2<-3": [[0, 0], [-2, 0], [ 1, 0], [-2,  1], [ 1,  2]],
+    "3->0": [[0, 0], [ 1, 0], [-2, 0], [ 1,  2], [-2,  1]],
+    "3<-0": [[0, 0], [-1, 0], [ 2, 0], [-2, -2], [ 2, -1]],
+};
+const shapeOKicks: KickMap = {
+    "0->1": [[0, 0]],
+    "1->2": [[0, 0]],
+    "2->3": [[0, 0]],
+    "3->0": [[0, 0]],
+    "0<-1": [[0, 0]],
+    "1<-2": [[0, 0]],
+    "2<-3": [[0, 0]],
+    "3<-0": [[0, 0]],
+};
+const kickMap: ShapeMap<KickMap> = {
+    I: shapeIKicks,
+    J: defaultKicks,
+    L: defaultKicks,
+    O: shapeOKicks,
+    S: defaultKicks,
+    T: defaultKicks,
+    Z: defaultKicks,
+};
 
 const checkNextPosition: (gameBoard: GameRow[], piece: Piece) => boolean = (gameBoard, piece) => {
     const flatGameBoard: number[] = gameBoard.map(
@@ -134,21 +176,29 @@ export const actions: ActionTree<BoardState, RootState> = {
         }
 
         let nextPosition = state.activePiece.maskPosition + direction;
-
         if (nextPosition < 0) {
             nextPosition = state.activePiece.shape.mask.length - 1;
         } else {
             nextPosition = nextPosition % state.activePiece.shape.mask.length;
         }
 
+        const kickKey = KickKey`${state.activePiece.maskPosition}${direction}${nextPosition}`;
         const newPiece = clonePiece(state.activePiece);
         newPiece.maskPosition = nextPosition;
 
-        if (!checkNextPosition(state.gameBoard, newPiece)) {
-            return;
-        }
+        const kickedPosition = kickMap[newPiece.shape.name][kickKey].find((value) => {
+            if (state.activePiece === null) {
+                return false;
+            }
 
-        commit(mutations.ROTATE_PIECE, nextPosition);
+            newPiece.x = state.activePiece.x + value[0];
+            newPiece.y = state.activePiece.y + value[0];
+            return checkNextPosition(state.gameBoard, newPiece)
+        });
+
+        if (kickedPosition !== undefined) {
+            commit(mutations.ROTATE_PIECE, newPiece);
+        }
     },
 
     translatePiece({ dispatch, commit, state }, {x = 0, y = 0}) {
